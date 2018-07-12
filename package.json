@@ -1,0 +1,12 @@
+{
+  "name": "flying-circus-connection-websocket",
+  "version": "0.1.0",
+  "description": "WebSocket connection for Flying Circus",
+  "main": "index.js",
+  "repository": "https://github.com/murilopolese/flying-circus-connection-websocket",
+  "author": "Murilo Polese <murilopolese@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "ws": "websockets/ws"
+  }
+}
