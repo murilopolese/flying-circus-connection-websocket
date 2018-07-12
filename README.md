@@ -6,6 +6,16 @@ This repository contains a connection class for Flying Circus to interact with a
 
 Most of the code in this class was taken from [MicroPythons official WebREPL repo](https://github.com/micropython/webrepl).
 
+# Usage
+
+First install the dependencies by running `yarn install`.
+
+Then require it to your project:
+
+```javascript
+var WebsocketConnection = require('flying-circus-connection-websocket')
+```
+
 # Methods
 
 The connection class implements the following methods:
