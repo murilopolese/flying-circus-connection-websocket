@@ -231,8 +231,10 @@ remove('${path}')`
                     // final response for put
                     if (this._decodeResp(data) == 0) {
                         console.log(`Sent ${this.sendFileName}, ${this.sendFileData.length} bytes`)
+                        this.emit('output', `Sent ${this.sendFileName}, ${this.sendFileData.length} bytes\r\n`)
                     } else {
                         console.log(`Failed sending ${this.sendFileName}`)
+                        this.emit('output', `Failed sending ${this.sendFileName}\r\n`)
                     }
                     this.binaryState = 0
                     break;
@@ -260,6 +262,7 @@ remove('${path}')`
                             new_buf.set(data.slice(2), this.getFileData.length)
                             this.getFileData = new_buf
                             console.log('Getting ' + this.getFileName + ', ' + this.getFileData.length + ' bytes')
+                            this.emit('output', 'Getting ' + this.getFileName + ', ' + this.getFileData.length + ' bytes\r\n')
 
                             var rec = new Uint8Array(1)
                             rec[0] = 0
@@ -274,6 +277,7 @@ remove('${path}')`
                     // final response
                     if (this._decodeResp(data) == 0) {
                         console.log(`Got ${this.getFileName}, ${this.getFileData.length} bytes`)
+                        this.emit('output', `Got ${this.getFileName}, ${this.getFileData.length} bytes\r\n`)
                         this._saveAs(this.getFileName, this.getFileData)
                     } else {
                         console.log(`Failed getting ${this.getFileName}`)
@@ -337,7 +341,12 @@ remove('${path}')`
         this.evaluate(this.EXIT_RAW_REPL)
     }
     _executeRaw(raw) {
-        this.evaluate(raw)
+        for(let i = 0; i < raw.length; i += 256) {
+            setTimeout(() => {
+                this.evaluate(raw.substr(i, 256))
+                console.log('sent', raw.substr(i, 256))
+            }, (1 + i) * 50)
+        }
         if (raw.indexOf('\n') == -1) {
             this.evaluate('\r')
         }
