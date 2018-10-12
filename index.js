@@ -52,10 +52,51 @@ class WebsocketConnection extends EventEmitter {
     * @param {String} code String of code to be executed. Line breaks must be `\n`
     */
     execute(code) {
-        this.stop()
-        this._enterRawRepl()
-        this._executeRaw(code)
-        this._exitRawRepl()
+        let interval = 30
+        let page = 80
+        let enterRawRepl = () => {
+            return new Promise((resolve) => {
+                this._enterRawRepl()
+                setTimeout(() => {
+                    resolve()
+                }, interval*2)
+            })
+        }
+        let executeRaw = () => {
+            return new Promise((resolve, reject) => {
+                let lines = code.split('\n')
+                let t = 0
+                this.emit('output', `\r\n`)
+                for(let i = 0; i < lines.length; i++) {
+                    let line = lines[i]
+                    if (line.length < page) {
+                        t += lines[i].length
+                        setTimeout(() => {
+                            this.evaluate(line+'\n')
+                            this.emit('output', `.`)
+                        }, t)
+                    } else {
+                        for(let j = 0; j < Math.ceil(line.length / page); j++) {
+                            t += page
+                            setTimeout(() => {
+                                this.evaluate(line.substr(j*1024, 1024))
+                                this.emit('output', `.`)
+                            }, t)
+                        }
+                    }
+                }
+                setTimeout(() => {
+                    resolve()
+                }, t+100)
+            })
+        }
+        let exitRawRepl = () => {
+            this._exitRawRepl()
+            return Promise.resolve()
+        }
+        return enterRawRepl()
+            .then(executeRaw)
+            .then(exitRawRepl)
     }
     /**
     * Evaluate a command/expression.
